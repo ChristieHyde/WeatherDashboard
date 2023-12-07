@@ -5,13 +5,31 @@ var searchFormEl = $("#search-form");
 var searchInputEl = $("#city-search");
 var currentWeatherRootEl = $("#current-weather");
 var forecastRootEl = $("#forecast");
+var searchHistoryRootEl = $("#search-history");
 
-searchFormEl.on("submit", (e) => {
-    e.preventDefault();
+var searchHistoryList = [];
+if (localStorage.getItem("history")) {
+    searchHistoryList = JSON.parse(localStorage.getItem("history"));
+}
+renderSearchHistory();
+
+searchFormEl.on("submit", (event) => {
+    event.preventDefault();
+    searchAndDisplay(searchInputEl.val());
+});
+
+searchHistoryRootEl.on("click", (event) => {
+    event.preventDefault();
+    if(event.target.matches(".search-item")) {
+        searchAndDisplay($(event.target).text());
+    }
+});
+
+function searchAndDisplay(searchedCity) {
     currentWeatherRootEl.empty();
     forecastRootEl.empty();
+    searchHistoryRootEl.empty();
 
-    var searchedCity = searchInputEl.val();
     var apiCurrentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchedCity}&appid=${apiKey}&units=metric`;
     var apiForecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${searchedCity}&appid=${apiKey}&units=metric`;
     
@@ -20,7 +38,6 @@ searchFormEl.on("submit", (e) => {
             return response.json();
         })
         .then(function (currentWeatherRaw) {
-            console.log(currentWeatherRaw);
             var currentWeatherProcessed = processWeather(currentWeatherRaw);
 
             var cityNameEl = $('<p>');
@@ -63,7 +80,6 @@ searchFormEl.on("submit", (e) => {
             return response.json();
         })
         .then(function (forecastRaw) {
-            console.log(forecastRaw);
             for(let i=0; i<forecastRaw.list.length; i++) {
                 var forecastProcessed = processWeather(forecastRaw.list[i], forecastRaw.city.timezone);
 
@@ -97,8 +113,18 @@ searchFormEl.on("submit", (e) => {
             }
         })
 
+    // remove city from search history if it exists in it
+    var matches = (element) => element == searchedCity;
+    var inListIndex = searchHistoryList.findIndex(matches);
+    if (inListIndex >= 0) {
+        searchHistoryList.splice(inListIndex, 1);
+    }
     // add city to search history
-});
+    searchHistoryList.unshift(searchedCity);
+    localStorage.setItem("history", JSON.stringify(searchHistoryList));
+    // re-render search history
+    renderSearchHistory();
+}
 
 function processWeather(rawWeather, timezone) {
     var processedWeather = {
@@ -131,7 +157,14 @@ function processWeather(rawWeather, timezone) {
     return processedWeather;
 }
 
-
+function renderSearchHistory() {
+    for (let i = 0; i < searchHistoryList.length; i++) {
+        searchItemEl = $('<li>');
+        searchItemEl.text(searchHistoryList[i]);
+        searchItemEl.addClass("search-item")
+        searchHistoryRootEl.append(searchItemEl);
+    }
+}
 
 // API Tests
 if (DEBUG) {
