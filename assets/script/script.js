@@ -8,6 +8,10 @@ $(function () {
     var currentWeatherRootEl = $("#current-weather");
     var forecastRootEl = $("#forecast");
     var searchHistoryRootEl = $("#search-history");
+    var forecastHeadingEl = $("#forecast-heading");
+
+    currentWeatherRootEl.hide();
+    forecastHeadingEl.hide();
 
     var searchHistoryList = [];
     if (localStorage.getItem("history")) {
@@ -31,6 +35,8 @@ $(function () {
         currentWeatherRootEl.empty();
         forecastRootEl.empty();
         searchHistoryRootEl.empty();
+        currentWeatherRootEl.show();
+        forecastHeadingEl.show();
 
         var apiCurrentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchedCity}&appid=${API_KEY}&units=metric`;
         var apiForecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${searchedCity}&appid=${API_KEY}&units=metric`;
@@ -42,11 +48,11 @@ $(function () {
             .then(function (currentWeatherRaw) {
                 var currentWeatherProcessed = processWeather(currentWeatherRaw, currentWeatherRaw.timezone);
 
-                var cityNameEl = $('<p>');
+                var cityNameEl = $('<h2>');
                 var currentDateEl = $('<p>');
                 var iconImgEl = $('<img>');
-                var currentTemperatureEl = $('<p>');
-                var conditionSummaryEl = $('<p>');
+                var currentTemperatureEl = $('<h3>');
+                var conditionSummaryEl = $('<h4>');
                 var conditionListEl = $('<ul>');
                 var minEl = $('<li>');
                 var maxEl = $('<li>');
@@ -57,7 +63,7 @@ $(function () {
                 currentDateEl.text(`Weather at ${currentWeatherProcessed.dateTime}:`);
                 currentTemperatureEl.text(`${currentWeatherProcessed.temperature}°C`);
                 conditionSummaryEl.text(currentWeatherProcessed.summary);
-                iconImgEl.attr("src", currentWeatherProcessed.iconUrl);
+                iconImgEl.attr("src", currentWeatherProcessed.iconUrlBig);
 
                 minEl.text(`Minimum: ${currentWeatherProcessed.tempMin}°C`);
                 maxEl.text(`Maximum: ${currentWeatherProcessed.tempMax}°C`);
@@ -120,6 +126,8 @@ $(function () {
                     var windEl = $('<li>');
                     var humidEl = $('<li>');
 
+                    forecastDayCardEl.addClass("forecast-card col-2");
+
                     forecastDateEl.text(forecastCardList[i].date);
                     conditionSummaryEl.text(mostCommon(forecastCardList[i].summary));
                     iconImgEl.attr("src", mostCommon(forecastCardList[i].iconUrl));
@@ -163,6 +171,7 @@ $(function () {
             dateTime: "",
             summary: "",
             iconUrl: "",
+            iconUrlBig: "",
             temperature: "",
             tempMin: "",
             tempMax: "",
@@ -179,7 +188,8 @@ $(function () {
 
         var iconCode = rawWeather.weather[0].icon;
         processedWeather.iconUrl = `https://openweathermap.org/img/wn/${iconCode}.png`;
-        
+        processedWeather.iconUrlBig = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
         var localDate = new Date((rawWeather.dt+timezone)*1000).toUTCString();
         var date = localDate.slice(5, 16);
         var time = localDate.slice(17, 22);
