@@ -5,6 +5,7 @@
     --dash-border: #b2beb5;
 }
 
+/* Base level styles */
 main {
     margin-left: 0;
     display: flex;
@@ -20,17 +21,20 @@ ul {
     width: 98%;
 }
 
+/* Header style */
 header {
     padding: 20px;
     background-color: var(--header-accent);
 }
 
+/* Sidebar styles */
 .sidebar {
     border-right: 1px dashed grey;
     height: 100%;
     padding-top: 20px;
 }
 
+/* Form styles */
 #search-form {
     width: 95%;
     margin-left: 2.5%;
@@ -51,6 +55,7 @@ header {
     align-self: right;
 }
 
+/* Search history styles */
 #search-history {
     margin-top: 20px;
     border-top: 1px dashed grey;
@@ -66,6 +71,8 @@ header {
     text-align: center;
 }
 
+/* Main content styles */
+/* Current weather card styles */
 #current-weather {
     margin: 15px 0;
     background-color: var(--card-accent);
@@ -80,6 +87,7 @@ header {
     margin-left: 10px;
 }
 
+/* Forecast card styles */
 #forecast {
     margin-left: 0;
 }
